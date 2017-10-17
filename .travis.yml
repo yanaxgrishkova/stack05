@@ -3,8 +3,6 @@ sudo: false
 
 matrix:
   include:
-
-    # Linux C++14 GCC builds
     - os: linux
       compiler: gcc
       addons: &gcc7
@@ -39,9 +37,7 @@ matrix:
               key_url: 'https://apt.llvm.org/llvm-snapshot.gpg.key'
             - ubuntu-toolchain-r-test
           packages: ['clang-5.0']
-
-    # OSX C++14 Clang Builds
-
+          
     - os: osx
       osx_image: xcode8.3
       compiler: clang
