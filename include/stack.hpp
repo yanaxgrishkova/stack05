@@ -12,11 +12,11 @@ private:
 
 public:
 	stack();
-	stack(stack<T> const &) /* strong */;
+	stack(stack<T> const &);
 	stack<T>& operator = (stack<T> const &);
 	size_t count() const;
-	void push(T const &) /* strong */;
-	auto pop() -> std::shared_ptr<T>; /* strong */;
+	void push(T const &);
+	auto pop() -> std::shared_ptr<T>;
 	bool empty() const;
 
 private:
@@ -59,7 +59,6 @@ stack<T>::stack(stack<T> const& copy)
 template <typename T>
 stack<T>& stack<T>::operator=(stack<T> const& other)
 {
-	std::lock(mutex_, other.mutex_);
 	if (this != &other)
 	{
 		stack<T> temp(other);
@@ -67,9 +66,6 @@ stack<T>& stack<T>::operator=(stack<T> const& other)
 	}
 
 	return *this;
-	
-	mutex_.unlock();
-	other.mutex_.unlock();
 }
 
 template <typename T>
