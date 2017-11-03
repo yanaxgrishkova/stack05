@@ -120,7 +120,7 @@ auto stack<T>::pop() -> std::shared_ptr<T>
 	{
 		--count_;
 	}
-	auto top = std::make_shared<T>(array_[count_ - 1]);
+	auto top = std::make_shared<T>(array_[count_]);
 	return top;
 }
 
