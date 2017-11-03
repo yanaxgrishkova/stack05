@@ -51,7 +51,6 @@ stack<T>::stack(stack<T> const& copy)
 	}
 	catch (...)
 	{
-		std::cerr << "Error! Try again!" << std::endl;
 		delete[] array_;
 	}
 }
@@ -82,26 +81,32 @@ void stack<T>::swap(stack<T>& other)
 template <typename T>
 void stack<T>::push(T const& value)
 {
-	mutex_.lock();
+	std::lock_guard<std::mutex> lock(mutex_);
 	if (array_size_ == count_)
 	{
 		size_t size = array_size_;
-		if (size == 0)
-			size = 1;
-		else
-			size = array_size_ * 2;
+		size == 0 ? 1 : array_size_ * 2;
 
 		T* temp = new T[size];
-		std::copy(array_, array_ + count_, temp);
+		
+		try
+		{
+			std::copy(array_, array_ + count_, temp);	
+		}
+		
+		catch ( ... )
+		{
+			delete[] temp;
+			throw;
+		}
 
 		array_size_ = size;
 		delete[] array_;
 		array_ = temp;
 	}
-
+	
 	array_[count_] = value;
 	++count_;
-	mutex_.unlock();
 }
 
 template <typename T>
