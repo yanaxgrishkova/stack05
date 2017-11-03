@@ -52,6 +52,7 @@ stack<T>::stack(stack<T> const& copy)
 	catch (...)
 	{
 		delete[] array_;
+		throw;
 	}
 }
 
@@ -123,21 +124,6 @@ auto stack<T>::pop() -> std::shared_ptr<T>
 	}
 	auto top = std::make_shared<T>(array_[count_]);
 	return top;
-}
-
-template <typename T>
-T stack<T>::top()
-{
-	mutex_.lock();
-	if (count_ == 0)
-	{
-		throw "Stack is empty!";
-	}
-	else
-	{
-		return array_[count_ - 1];
-	}
-	mutex_.unlock();
 }
 
 template <typename T>
