@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include <algorithm>
 #include <utility>
+#include <new>
+#include <thread>
 #include <mutex>
 #include <condition_variable>
 
@@ -121,7 +123,7 @@ auto stack<T>::wait_and_pop() -> std::shared_ptr<T>
 
 	if (empty())
 	{
-		cond_.wait_for(mutex_);
+		cond_.wait_for(lock);
 	}
 	else
 	{
