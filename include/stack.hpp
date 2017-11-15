@@ -3,8 +3,9 @@
 #include <algorithm>
 #include <utility>
 #include <mutex>
+#include <condition_variable>
 
-template <typename T>
+template <typename T> /*thread-safe*/
 class stack
 {
 private:
@@ -16,11 +17,13 @@ public:
 	stack<T>& operator = (stack<T> const &);
 	size_t count() const;
 	void push(T const &);
-	auto pop() -> std::shared_ptr<T>;
+	auto try_pop() -> std::shared_ptr<T>;
+  	auto wait_and_pop() -> std::shared_ptr<T>;
 	bool empty() const;
 
 private:
 	mutable std::mutex mutex_;
+	std::condition_variable cond_;
 	T* array_;
 	size_t array_size_;
 	size_t count_;
@@ -108,22 +111,41 @@ void stack<T>::push(T const& value)
 	
 	array_[count_] = value;
 	++count_;
+	cond_.notify_all();
 }
 
 template <typename T>
-auto stack<T>::pop() -> std::shared_ptr<T>
+auto stack<T>::wait_and_pop() -> std::shared_ptr<T>
 {
-	std::lock_guard<std::mutex> lock(mutex_);
+	std::unique_lock<std::mutex> lock(mutex_);
+
 	if (empty())
 	{
-		throw "Stack is empty! Try again!\n";
+		cond_.wait_for(mutex_);
+	}
+	else
+	{
+		--count_;
+	}	
+	auto pop = std::make_shared<T>(array_[count_]);
+	return pop;
+}
+
+template <typename T>
+auto stack<T>::try_pop() -> std::shared_ptr<T>
+{
+	std::lock_guard<std::mutex> lock(mutex_);
+	
+	if (empty())
+	{
+		return nullptr;
 	}
 	else
 	{
 		--count_;
 	}
-	auto top = std::make_shared<T>(array_[count_]);
-	return top;
+	auto pop = std::make_shared<T>(array_[count_]);
+	return pop;
 }
 
 template <typename T>
