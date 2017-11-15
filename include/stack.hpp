@@ -123,7 +123,7 @@ auto stack<T>::wait_and_pop() -> std::shared_ptr<T>
 
 	if (empty())
 	{
-		cond_.wait_for(lock);
+		cond_.wait(lock);
 	}
 	else
 	{
