@@ -12,7 +12,7 @@ TEST_CASE("push", "") {
     REQUIRE(s1.count() == 5);
 }
 
-TEST_CASE("pop", "") {
+TEST_CASE("try_pop", "") {
     stack<int> s1;
     s1.push(1);
     s1.push(2);
@@ -20,20 +20,27 @@ TEST_CASE("pop", "") {
     s1.push(4);
     s1.push(5);
     REQUIRE(s1.count() == 5);
-    s1.pop();
+    s1.try_pop();
     REQUIRE(s1.count() == 4);
-    s1.pop();
+    s1.try_pop();
     REQUIRE(s1.count() == 3);
-    s1.pop();
+    s1.try_pop();
     REQUIRE(s1.count() == 2);
 }
 
-TEST_CASE("top", "") {
+TEST_CASE("wait_and_pop", "") {
     stack<int> s1;
     s1.push(1);
     s1.push(2);
     s1.push(3);
     s1.push(4);
-    s1.top();
+    s1.push(5);
+    REQUIRE(s1.count() == 5);
+    s1.wait_and_pop();
     REQUIRE(s1.count() == 4);
+    s1.wait_and_pop();
+    REQUIRE(s1.count() == 3);
+    s1.wait_and_pop();
+    REQUIRE(s1.count() == 2);
 }
+
