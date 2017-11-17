@@ -39,6 +39,7 @@ template <typename T>
 size_t stack<T>::count() const
 {
 	std::lock_guard<std::mutex> lock(mutex_);
+	
 	return count_;
 }
 
@@ -46,10 +47,12 @@ template <typename T>
 stack<T>::stack(stack<T> const& copy)
 {
 	std::lock_guard<std::mutex> lock(copy.mutex_);
+	
 	T* temp = new T[copy.array_size_];
 	array_size_ = copy.array_size_;
 	count_ = copy.count_;
 	array_ = temp;
+	
 	try
 	{
 		std::copy(copy.array_, copy.array_ + count_, array_);
@@ -77,9 +80,11 @@ template <typename T>
 void stack<T>::swap(stack<T>& other)
 {
 	std::lock(mutex_, other.mutex_);
+	
 	std::swap(array_, other.array_);
 	std::swap(array_size_, other.array_size_);
 	std::swap(count_, other.count_);
+	
 	mutex_.unlock();
 	other.mutex_.unlock();
 }
@@ -98,7 +103,6 @@ void stack<T>::push(T const& value)
 		{
 			std::copy(array_, array_ + count_, temp);	
 		}
-		
 		catch ( ... )
 		{
 			delete[] temp;
@@ -112,6 +116,7 @@ void stack<T>::push(T const& value)
 	
 	array_[count_] = value;
 	++count_;
+	
 	cond_.notify_all();
 }
 
@@ -120,16 +125,13 @@ auto stack<T>::wait_and_pop() -> std::shared_ptr<T>
 {
 	std::unique_lock<std::mutex> lock(mutex_);
 
-	if (empty())
+	while (empty())
 	{
 		cond_.wait(lock);
 	}
-	else
-	{
-		--count_;
-	}	
-	auto pop = std::make_shared<T>(array_[count_]);
-	return pop;
+	--count_;
+	
+	return std::make_shared<T>(array_[count_]);
 }
 
 template <typename T>
@@ -145,8 +147,8 @@ auto stack<T>::try_pop() -> std::shared_ptr<T>
 	{
 		--count_;
 	}
-	auto pop = std::make_shared<T>(array_[count_]);
-	return pop;
+	
+	return std::make_shared<T>(array_[count_]);
 }
 
 template <typename T>
