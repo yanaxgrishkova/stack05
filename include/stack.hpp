@@ -2,8 +2,6 @@
 #include <stdexcept>
 #include <algorithm>
 #include <utility>
-#include <new>
-#include <thread>
 #include <mutex>
 #include <condition_variable>
 
