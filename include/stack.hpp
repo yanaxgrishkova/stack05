@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include <algorithm>
 #include <utility>
+#include <thread>
+#include <new>
 #include <mutex>
 #include <condition_variable>
 
@@ -90,7 +92,7 @@ void stack<T>::swap(stack<T>& other)
 template <typename T>
 void stack<T>::push(T const& value)
 {
-	std::lock_guard<std::mutex> lock(mutex_);
+	std::unique_lock<std::mutex> lock(mutex_);
 	if (array_size_ == count_)
 	{
 		size_t size = array_size_ == 0 ? 1 : array_size_ * 2;
