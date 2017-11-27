@@ -1,8 +1,9 @@
 #include <iostream>
-#include <stdexcept>
 #include <algorithm>
-#include <utility>
+#include <new>
+#include <thread>
 #include <mutex>
+#include <memory>
 
 template <typename T>
 class stack
@@ -85,8 +86,7 @@ void stack<T>::push(T const& value)
 	std::lock_guard<std::mutex> lock(mutex_);
 	if (array_size_ == count_)
 	{
-		size_t size = array_size_;
-		size == 0 ? 1 : array_size_ * 2;
+		size_t size = array_size_ == 0 ? 1 : array_size_ * 2;
 
 		T* temp = new T[size];
 		
